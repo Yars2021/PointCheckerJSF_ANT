@@ -1,4 +1,4 @@
-<project name="PoibtCheckerJSF" default="build" basedir=".">
+<project name="PointCheckerJSF" default="build" basedir=".">
 	<description>
 		Apache ANT build for PointChecker JSF
 	</description>
@@ -84,7 +84,67 @@
 		</xmlvalidate>
 	</target>
 	
-	<target name="diff" description="Checks the differences and commits">
+	<target name="commit" if="${git.commit}" description="Commits everything">
+		<exec executable="git" dir=".">
+			<arg value="add" />
+			<arg value="./*" />
+		</exec>
 		
+		<exec executable="git" dir=".">
+			<arg value="commit" />
+			<arg value="-m" />
+			<arg value="Diff commit" />
+		</exec>
+	</target>
+	
+	<target name="diff" description="Checks the differences and commits">
+		<exec executable="git" outputproperty="git.diff.res">
+			<arg value="diff" />
+			<arg value="--name-only" />
+		</exec>
+	
+		<loadfile property="params.res" srcfile="params.txt" />
+	
+		<property name="git.commit" value="True" />
+	
+		<script language="javascript"> 
+		<![CDATA[
+			if (project.getProperty("git.diff.res") == null || project.getProperty("params.res") == null) {
+				print("No files found in params or git diff result")
+				project.setProperty("git.commit", "False")
+			} else {
+				diff_files = project.getProperty("git.diff.res").trim().split("\n")
+				param_files = project.getProperty("params.res").trim().split("\n")
+				
+				for (i = 0; i < diff_files.length; i++) {
+					diff_files[i] = diff_files[i].trim()
+				}
+				
+				for (i = 0; i < param_files.length; i++) {
+					param_files[i] = param_files[i].trim()
+				}
+				
+				intersection = []
+				
+				for (i = 0; i < diff_files.length; i++) {
+					for (j = 0; j < param_files.length; j++) {
+						str = diff_files[i] + " ~ " + param_files[j]
+						if (diff_files[i] == param_files[j]) {
+							intersection.push(diff_files[i])
+						}
+					}
+				}
+				
+				if (intersection.length > 0) {
+					project.setProperty("git.commit", "False")
+				} else {
+					project.setProperty("git.commit", "True")
+				}
+			}
+		]]> 
+		</script>
+		
+		<!-- <echo message="${git.commit}" /> -->
+		<antcall target="commit" />
 	</target>
 </project>

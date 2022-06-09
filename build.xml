@@ -41,6 +41,12 @@
 			<path refid="project.class.path" />
 		</copy>
 		<!--jar jarfile="${dist}/lib/${artifact}-${DSTAMP}.jar" basedir="${build}" /-->
+		<jar destfile="${jar}/PointCheckerJSF.jar" basedir="${build}" compress="false" index="true">
+            <manifest>
+                <attribute name="Main-Class" value="Main" />
+				<attribute name="Version" value="0.1.3-SNAPSHOT" />
+            </manifest>
+        </jar>
 	</target>
 
 	<target name="clean" description="clean up">
@@ -76,5 +82,9 @@
 		<xmlvalidate failonerror="${xml.failonerror}">
 			<fileset dir="src" includes="**/*.xml" />
 		</xmlvalidate>
+	</target>
+	
+	<target name="diff" description="Checks the differences and commits">
+		
 	</target>
 </project>

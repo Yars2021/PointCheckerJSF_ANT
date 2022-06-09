@@ -85,6 +85,8 @@
 	</target>
 	
 	<target name="commit" if="${git.commit}" description="Commits everything">
+		<echo message="Commiting files..." />
+		
 		<exec executable="git" dir=".">
 			<arg value="add" />
 			<arg value="./*" />
